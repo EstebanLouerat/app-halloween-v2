@@ -13,11 +13,10 @@
 > Soit je fais en monolithic avec Nextjs prisma etc soit je garde le premier repo et j'en fais un deuxième avec une API REST express nodejs
 
 - [x] Mettre une page d'accueil avec un bouton "ajouter un generateur"
-- [ ] Le nombre de generateur actif
 - [ ] Dans les paramètre mettre un bouton supprimer ou désinscrire le générateur
-- [ ] Faire API/Backend (NextJS, Php, Nuxtjs ?) + config base de donnée postgres vercel
+- [x] Faire API/Backend (NextJS, Php, Nuxtjs ?) + config base de donnée postgres vercel
 - [ ] Mettre le nombre de générateur et update dynamiquement
-- [ ] Améliorer l'UI
+- [x] Améliorer l'UI
 
 ## Idées
 
