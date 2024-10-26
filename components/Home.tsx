@@ -9,6 +9,7 @@ const Home: React.FC = () => {
       <div className="flex flex-col justify-center items-center gap-80">
         <Image
           src={"/assets/dbd_logo.png"}
+          priority={true}
           alt={"logo"}
           width="500"
           height="500"

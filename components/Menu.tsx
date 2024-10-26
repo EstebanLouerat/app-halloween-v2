@@ -1,3 +1,5 @@
+import { useActiveGenerator } from "@/contexts/ActiveGeneratorContext";
+import prisma from "@/lib/prisma";
 import { DbdGenerator } from "@/pages/api/generators";
 import cuid from "cuid";
 import { useRouter } from "next/router";
@@ -10,25 +12,35 @@ type MenuProps = {
 
 const Menu: React.FC<MenuProps> = ({ generators }) => {
   const router = useRouter();
+  const [generatorsArray, setGeneratorsArray] = useState<DbdGenerator[]>(
+    Object.values(generators) || []
+  );
+  const { activeGeneratorId, setActiveGeneratorId } = useActiveGenerator();
 
   if (!generators) {
     return <>There is no generator</>;
   }
-
-  const [generatorsArray, setGeneratorsArray] = useState<DbdGenerator[]>(
-    Object.values(generators) || []
-  );
 
   const addGen = () => {
     const newGenerator: DbdGenerator = {
       id: cuid(),
       name: "Test",
       timeLeft: 90,
+      isActif: false,
     };
 
     console.log(newGenerator);
 
     setGeneratorsArray((prev) => [...prev, newGenerator]);
+  };
+
+  // const deleteGen = (generator) => {
+  //   await prisma.generator.delete();
+  // };
+
+  const handleSelectGenerator = (id: string) => {
+    setActiveGeneratorId(id);
+    router.push(`/g/${id}`);
   };
 
   return (
@@ -54,10 +66,13 @@ const Menu: React.FC<MenuProps> = ({ generators }) => {
           {generatorsArray.map((gen) => (
             <div key={gen.id} className="flex items-center mb-4">
               <button
-                className="bg-gray-800 text-white text-lg px-4 py-2 rounded mr-2 hover:bg-gray-700 transition w-40 h-16"
-                onClick={() => router.push(`/g/${gen.id}`)}
+                className="bg-gray-800 text-white text-lg px-4 py-2 rounded mr-2 hover:bg-gray-700 transition w-40 h-16 items-center justify-between"
+                onClick={() => handleSelectGenerator(gen.id)}
               >
-                {gen.name}
+                <span>{gen.name}</span>
+                {gen.isActif && (
+                  <span className="ml-2 w-4 h-4 bg-green-500 rounded-full animate-pulse inline-block"></span>
+                )}
               </button>
               <button
                 className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition"
@@ -67,9 +82,7 @@ const Menu: React.FC<MenuProps> = ({ generators }) => {
               </button>
               <button
                 className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition"
-                onClick={() => {
-                  /* Logique pour supprimer le générateur */
-                }}
+                onClick={() => {}}
               >
                 <MdDelete size={32} />
               </button>

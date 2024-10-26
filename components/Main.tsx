@@ -1,13 +1,14 @@
 import { DbdGenerator } from "@/pages/api/generators";
-import axios from "axios";
+import { MainProps } from "@/pages/g/[id]";
 import confetti from "canvas-confetti";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SlSettings } from "react-icons/sl";
 
-const Main: React.FC<DbdGenerator> = (generator) => {
+const Main: React.FC<MainProps> = (props) => {
   const router = useRouter();
 
+  const generator = props.generator;
   const settings = generator.settings;
 
   console.log(generator);
@@ -38,42 +39,11 @@ const Main: React.FC<DbdGenerator> = (generator) => {
   const [isTimerRunning, setIsTimerRunning] = useState(true);
   const [isKillerActive, setIsKillerActive] = useState(false);
   const [isKillerCooldown, setIsKillerCooldown] = useState(false);
-  const [genActif, setGenActif] = useState(0);
-  const [totalGen, setTotalGen] = useState(0);
+  const [genActif, setGenActif] = useState(props.totalGenDone);
+  const [totalGen, setTotalGen] = useState(props.totalGen);
 
   const intervalRef = useRef<number | null>(null);
   const killerIntervalRef = useRef<number | null>(null);
-
-  // useEffect(() => {
-  //   axios.get<Generator[]>("/api/generators").then((response) => {
-  //     let actif = 0;
-  //     response.data.forEach((d: Generator) => {
-  //       if (d.timeLeft === 0) {
-  //         actif += 1;
-  //       }
-
-  //       // setSettingsName(d.settingsName);
-  //       // setName(d.name);
-  //       // setTimeLeft(d.timeLeft);
-
-  //       // setTimerDuration(d.);
-  //       // setPlayerTimerRate();
-  //       // setKillerCooldown();
-  //       // setKillerTimerDuration();
-  //     });
-
-  //     // console.log(response.data);
-  //     setGenActif(actif);
-  //     setTotalGen(response.data.length);
-  //   });
-
-  //   axios.get<Setting[]>("/api/generators").then((response) => {
-  //     setTimerDuration(d.);
-  //     setPlayerTimerRate();
-  //     setKillerCooldown();
-  //     setKillerTimerDuration();
-  //   });
-  // }, []);
 
   const calculateInterval = () => {
     if (isKillerActive) return killerTimerDuration * 1000;
@@ -113,7 +83,7 @@ const Main: React.FC<DbdGenerator> = (generator) => {
     return Math.round(((timerDuration - count) / timerDuration) * 100);
   };
 
-  const updateTimer = () => {
+  const updateTimer = useCallback(() => {
     setCount((prevCount) => {
       if (prevCount <= 0) {
         setIsTimerRunning(false);
@@ -122,7 +92,7 @@ const Main: React.FC<DbdGenerator> = (generator) => {
       }
       return prevCount - 1;
     });
-  };
+  }, [timerDuration]);
 
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -182,7 +152,7 @@ const Main: React.FC<DbdGenerator> = (generator) => {
 
   const handleKillerBonus = () => {
     setCount((prevCount) => {
-      const bonus = Math.floor(timerDuration * 0.2); // 20% de 90s = 18s
+      const bonus = Math.floor(timerDuration * 0.2);
       return Math.min(prevCount + bonus, timerDuration);
     });
   };
@@ -222,18 +192,10 @@ const Main: React.FC<DbdGenerator> = (generator) => {
     return icons[Math.min(activePlayers, icons.length) - 1] || "⏳";
   };
 
-  // return (
-  //   <>
-  //     <h1>Main</h1>
-  //     <h2>
-  //       Le nombre de générateur réparé est de <span>{genActif}</span>/{totalGen}
-  //     </h2>
-  //   </>
-  // );
   return (
     <div
       className="relative flex flex-col justify-center items-center w-screen h-screen overflow-hidden px-4"
-      style={{ backgroundColor: "var(--color-grey-900-transparent)"}}
+      style={{ backgroundColor: "var(--color-grey-900-transparent)" }}
     >
       <button
         className="absolute top-2 left-2 bg-gray-200 p-2 rounded hover:bg-gray-300 transition duration-300"
@@ -261,7 +223,10 @@ const Main: React.FC<DbdGenerator> = (generator) => {
             </p>
           )
         )}
-        <div className="mt-8">
+        <div className="mt-4">
+          <h2 className="mb-4">
+            Total <span className="text-green-400">{genActif}</span>/{totalGen}
+          </h2>
           <h2 className="text-2xl mb-4">Hold your button!</h2>
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 h-[50svh]">
             <button className="bg-red-500 p-4 rounded" {...buttonProps}>

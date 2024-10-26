@@ -22,6 +22,7 @@ model Generator {
   id         String   @id @default(cuid())
   name       String
   timeLeft   Int
+  isActif    Boolean   @default(false)
   settings   Settings? @relation(fields: [settingsName], references: [alias])
   //TODO foreign key on settings
   settingsName String?

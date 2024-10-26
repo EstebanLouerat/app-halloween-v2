@@ -1,11 +1,9 @@
 import { GetServerSideProps } from "next";
-import Main from "../../components/Main";
 import prisma from "@/lib/prisma";
 import { DbdGenerator } from "../api/generators";
 import Menu from "@/components/Menu";
 
 export const getServerSideProps: GetServerSideProps = async () => {
-
   const generators = await prisma.generator.findMany({
     include: { settings: true },
   });
