@@ -1,6 +1,6 @@
-import { useActiveGenerator } from "@/contexts/ActiveGeneratorContext";
 import prisma from "@/lib/prisma";
 import { DbdGenerator } from "@/pages/api/generators";
+import { saveGeneratorToLocalStorage } from "@/utils/localStorage";
 import cuid from "cuid";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -15,7 +15,6 @@ const Menu: React.FC<MenuProps> = ({ generators }) => {
   const [generatorsArray, setGeneratorsArray] = useState<DbdGenerator[]>(
     Object.values(generators) || []
   );
-  const { activeGeneratorId, setActiveGeneratorId } = useActiveGenerator();
 
   if (!generators) {
     return <>There is no generator</>;
@@ -39,7 +38,7 @@ const Menu: React.FC<MenuProps> = ({ generators }) => {
   // };
 
   const handleSelectGenerator = (id: string) => {
-    setActiveGeneratorId(id);
+    saveGeneratorToLocalStorage(id);
     router.push(`/g/${id}`);
   };
 

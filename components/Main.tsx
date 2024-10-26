@@ -11,8 +11,6 @@ const Main: React.FC<MainProps> = (props) => {
   const generator = props.generator;
   const settings = generator.settings;
 
-  console.log(generator);
-
   // Generator's data
   const [name, setName] = useState(generator.name);
   const [settingsName, setSettingsName] = useState(generator.settingsName);
@@ -199,7 +197,7 @@ const Main: React.FC<MainProps> = (props) => {
     >
       <button
         className="absolute top-2 left-2 bg-gray-200 p-2 rounded hover:bg-gray-300 transition duration-300"
-        onClick={() => router.push("/settings")}
+        onClick={() => router.push(`/g/${generator.id}/settings`)}
       >
         <SlSettings color="black" size={"20px"} />
       </button>

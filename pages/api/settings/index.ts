@@ -23,6 +23,7 @@ export default async function handler(
     }
   } else if (req.method === "PUT") {
     const {
+      id,
       timerDuration,
       killerTimerDuration,
       killerCooldown,
@@ -30,7 +31,7 @@ export default async function handler(
     } = req.body;
     try {
       const settings = await prisma.settings.update({
-        where: { id: "cm2mav96k0000du2v9d6il0zg" }, // Assure-toi que ton ID est correct
+        where: { id: id }, // Assure-toi que ton ID est correct
         data: {
           timerDuration,
           killerTimerDuration,
