@@ -1,5 +1,9 @@
 import { DbdGenerator } from "@/pages/api/generators";
 import { MainProps } from "@/pages/g/[id]";
+import {
+  getTimerFromLocalStorage,
+  saveTimerToLocalStorage,
+} from "@/utils/localStorage";
 import confetti from "canvas-confetti";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -11,10 +15,13 @@ const Main: React.FC<MainProps> = (props) => {
   const generator = props.generator;
   const settings = generator.settings;
 
-  // Generator's data
+  // State for generator's data
   const [name, setName] = useState(generator.name);
   const [settingsName, setSettingsName] = useState(generator.settingsName);
-  const [timeLeft, setTimeLeft] = useState(generator.timeLeft);
+
+  // State for timer
+  const [timeLeft, setTimeLeft] = useState<number>(generator.timeLeft);
+  const [initialTimeSet, setInitialTimeSet] = useState(false); // Flag to check if time is set from localStorage
 
   // Setting's data
   const [killerCooldown, setKillerCooldown] = useState(
@@ -34,7 +41,7 @@ const Main: React.FC<MainProps> = (props) => {
   const [killerCount, setKillerCount] = useState(killerTimerDuration);
   const [cooldownCount, setCooldownCount] = useState(killerCooldown);
   const [activePlayers, setActivePlayers] = useState(0);
-  const [isTimerRunning, setIsTimerRunning] = useState(true);
+  const [isTimerRunning, setIsTimerRunning] = useState(timeLeft > 0);
   const [isKillerActive, setIsKillerActive] = useState(false);
   const [isKillerCooldown, setIsKillerCooldown] = useState(false);
   const [genActif, setGenActif] = useState(props.totalGenDone);
@@ -42,7 +49,9 @@ const Main: React.FC<MainProps> = (props) => {
 
   const intervalRef = useRef<number | null>(null);
   const killerIntervalRef = useRef<number | null>(null);
+  const cooldownIntervalRef = useRef<number | null>(null);
 
+  // Calculate interval duration based on state
   const calculateInterval = () => {
     if (isKillerActive) return killerTimerDuration * 1000;
     if (isKillerCooldown) return killerCooldown * 1000;
@@ -86,18 +95,31 @@ const Main: React.FC<MainProps> = (props) => {
       if (prevCount <= 0) {
         setIsTimerRunning(false);
         showConfetti();
-        return timerDuration;
+        return timerDuration; // Reset to the full duration after finishing
       }
+      saveTimerToLocalStorage(prevCount - 1);
       return prevCount - 1;
     });
   }, [timerDuration]);
 
+  // Load timer from localStorage on client mount
+  useEffect(() => {
+    if (typeof window !== "undefined" && !initialTimeSet) {
+      const storedTime = getTimerFromLocalStorage();
+      if (storedTime !== undefined) {
+        setTimeLeft(storedTime);
+        setCount(storedTime);
+        setIsTimerRunning(storedTime > 0);
+      }
+      setInitialTimeSet(true); // Set the flag to true after loading
+    }
+  }, [initialTimeSet]);
+
+  // Manage timer intervals
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
 
-    if (!isTimerRunning) return;
-
-    if (activePlayers > 0) {
+    if (isTimerRunning && activePlayers > 0) {
       const interval = calculateInterval();
       if (interval) {
         intervalRef.current = window.setInterval(updateTimer, interval);
@@ -107,8 +129,9 @@ const Main: React.FC<MainProps> = (props) => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [activePlayers, isTimerRunning]);
+  }, [activePlayers, isTimerRunning, updateTimer]);
 
+  // Manage killer timer
   useEffect(() => {
     if (isKillerActive) {
       killerIntervalRef.current = window.setInterval(() => {
@@ -130,6 +153,7 @@ const Main: React.FC<MainProps> = (props) => {
     };
   }, [isKillerActive]);
 
+  // Manage cooldown timer
   useEffect(() => {
     if (isKillerCooldown) {
       const cooldownInterval = window.setInterval(() => {
@@ -202,9 +226,7 @@ const Main: React.FC<MainProps> = (props) => {
         <SlSettings color="black" size={"20px"} />
       </button>
       <div
-        className={`text-center w-full max-w-md ${
-          !isTimerRunning ? "bg-red-100" : ""
-        }`}
+        className={`text-center w-full max-w-md ${!isTimerRunning ? "bg-red-100" : ""}`}
       >
         <button
           className="bg-black text-white p-3 rounded mb-4 w-full h-[20svh]"
@@ -216,9 +238,7 @@ const Main: React.FC<MainProps> = (props) => {
           <p>💀 Hold for: {formatTime(killerCount)}</p>
         ) : (
           isKillerCooldown && (
-            <p className="text-red-500">
-              💀 Cooldown: {formatTime(cooldownCount)}
-            </p>
+            <p className="text-red-500">💀 Cooldown: {formatTime(cooldownCount)}</p>
           )
         )}
         <div className="mt-4">

@@ -8,6 +8,11 @@
   box-sizing: border-box;
 }
 
+/* :root {
+  outline: solid red 10px;
+  outline-offset: -10px;
+} */
+
 body {
   --color-grey-50: hsl(265, 55%, 96%);
   --color-grey-100: hsl(265, 19%, 88%);

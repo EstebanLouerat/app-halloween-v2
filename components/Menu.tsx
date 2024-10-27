@@ -1,4 +1,8 @@
-import prisma from "@/lib/prisma";
+import axios from "axios";
+import {
+  NotificationStatus,
+  useNotification,
+} from "@/contexts/NotificationContext";
 import { DbdGenerator } from "@/pages/api/generators";
 import { saveGeneratorToLocalStorage } from "@/utils/localStorage";
 import cuid from "cuid";
@@ -12,6 +16,8 @@ type MenuProps = {
 
 const Menu: React.FC<MenuProps> = ({ generators }) => {
   const router = useRouter();
+  const { showNotification } = useNotification();
+
   const [generatorsArray, setGeneratorsArray] = useState<DbdGenerator[]>(
     Object.values(generators) || []
   );
@@ -20,22 +26,45 @@ const Menu: React.FC<MenuProps> = ({ generators }) => {
     return <>There is no generator</>;
   }
 
-  const addGen = () => {
-    const newGenerator: DbdGenerator = {
-      id: cuid(),
-      name: "Test",
-      timeLeft: 90,
-      isActif: false,
-    };
-
-    console.log(newGenerator);
-
-    setGeneratorsArray((prev) => [...prev, newGenerator]);
+  const handleAddGenerator = () => {
+    const countGen = generatorsArray.length + 1;
+    axios
+      .post("/api/generators", {
+        name: `Gen ${countGen}`,
+        settingsName: "Default",
+      })
+      .then(() => {
+        showNotification(
+          "Generator created successfully!",
+          NotificationStatus.SUCCESS
+        );
+        router.reload();
+      })
+      .catch((error) => {
+        showNotification(
+          `Error creating generator: ${error}`,
+          NotificationStatus.ERREUR
+        );
+      });
   };
 
-  // const deleteGen = (generator) => {
-  //   await prisma.generator.delete();
-  // };
+  const handleDeleteGenerator = (id: string) => {
+    axios
+      .delete(`/api/generators?id=${id}`)
+      .then(() => {
+        showNotification(
+          "Generator delete successfully!",
+          NotificationStatus.SUCCESS
+        );
+        router.reload();
+      })
+      .catch((error) => {
+        showNotification(
+          `Error deleting generator: ${error}`,
+          NotificationStatus.ERREUR
+        );
+      });
+  };
 
   const handleSelectGenerator = (id: string) => {
     saveGeneratorToLocalStorage(id);
@@ -57,7 +86,7 @@ const Menu: React.FC<MenuProps> = ({ generators }) => {
         <button
           className="bg-blue-500 text-white text-lg px-6 py-3 rounded mb-4 hover:bg-blue-600 transition"
           // onClick={() => router.push(`/g/add`)}
-          onClick={() => addGen()}
+          onClick={() => handleAddGenerator()}
         >
           Ajouter
         </button>
@@ -81,7 +110,7 @@ const Menu: React.FC<MenuProps> = ({ generators }) => {
               </button>
               <button
                 className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition"
-                onClick={() => {}}
+                onClick={() => handleDeleteGenerator(gen.id)}
               >
                 <MdDelete size={32} />
               </button>

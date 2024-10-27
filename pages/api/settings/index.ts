@@ -31,7 +31,7 @@ export default async function handler(
     } = req.body;
     try {
       const settings = await prisma.settings.update({
-        where: { id: id }, // Assure-toi que ton ID est correct
+        where: { id: id },
         data: {
           timerDuration,
           killerTimerDuration,
