@@ -194,7 +194,7 @@ const Menu: React.FC<MenuProps> = ({ generators }) => {
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className=" p-6 rounded text-black">
-            <p>T'es sûre tu veux delete fais gaffe quand même</p>
+            <p>T&apos;es sûre tu veux delete fais gaffe quand même</p>
             <div className="flex justify-end mt-4">
               <button
                 className="bg-red-500 text-white px-4 py-2 rounded mr-2"
@@ -206,7 +206,7 @@ const Menu: React.FC<MenuProps> = ({ generators }) => {
                 className="bg-gray-300 px-4 py-2 rounded"
                 onClick={() => setShowDeleteModal(null)}
               >
-                Nan enfaite j'ai un mini sexe
+                Nan enfaite j&apos;ai un mini sexe
               </button>
             </div>
           </div>
