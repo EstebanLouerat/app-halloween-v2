@@ -33,7 +33,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
     setTimeout(() => {
       setIsNotificationVisible(false);
-    }, 2000); // Notification will disappear after 2 seconds
+    }, 3000); // Notification will disappear after 2 seconds
   };
 
   return (

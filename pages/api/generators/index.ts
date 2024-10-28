@@ -37,7 +37,6 @@ export default async function handler(
         data: {
           name,
           timeLeft,
-          settings,
           settingsName,
           isActif,
         },

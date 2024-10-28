@@ -25,7 +25,7 @@ const Main: React.FC<MainProps> = (props) => {
 
   // Setting's data
   const [killerCooldown, setKillerCooldown] = useState(
-    settings?.killerCooldown || 20
+    settings?.killerCooldown || 2
   );
   const [killerTimerDuration, setKillerTimerDuration] = useState(
     settings?.killerTimerDuration || 5
@@ -226,7 +226,9 @@ const Main: React.FC<MainProps> = (props) => {
         <SlSettings color="black" size={"20px"} />
       </button>
       <div
-        className={`text-center w-full max-w-md ${!isTimerRunning ? "bg-red-100" : ""}`}
+        className={`text-center w-full max-w-md ${
+          !isTimerRunning ? "bg-red-100" : ""
+        }`}
       >
         <button
           className="bg-black text-white p-3 rounded mb-4 w-full h-[20svh]"
@@ -238,7 +240,9 @@ const Main: React.FC<MainProps> = (props) => {
           <p>💀 Hold for: {formatTime(killerCount)}</p>
         ) : (
           isKillerCooldown && (
-            <p className="text-red-500">💀 Cooldown: {formatTime(cooldownCount)}</p>
+            <p className="text-red-500">
+              💀 Cooldown: {formatTime(cooldownCount)}
+            </p>
           )
         )}
         <div className="mt-4">
@@ -273,6 +277,12 @@ const Main: React.FC<MainProps> = (props) => {
       </div>
       {!isTimerRunning && (
         <div className="absolute inset-0 bg-green-700 bg-opacity-70 flex justify-center items-center text-white text-4xl">
+          <button
+            className="absolute top-2 left-2 bg-gray-200 p-2 rounded hover:bg-gray-300 transition duration-300"
+            onClick={() => router.push(`/g/${generator.id}/settings`)}
+          >
+            <SlSettings color="black" size={"20px"} />
+          </button>
           Finish
         </div>
       )}
