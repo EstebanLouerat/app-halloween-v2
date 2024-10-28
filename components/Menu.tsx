@@ -193,7 +193,7 @@ const Menu: React.FC<MenuProps> = ({ generators }) => {
       {/* Modal pour la confirmation de suppression */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-opacity-80 bg-black p-6 rounded text-black">
+          <div className="bg-opacity-80 bg-black p-6 rounded text-white">
             <p>T&apos;es sûre tu veux delete fais gaffe quand même</p>
             <div className="flex justify-end mt-4">
               <button

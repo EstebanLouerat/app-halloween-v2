@@ -7,7 +7,7 @@ export type DbdGenerator = {
   name: string;
   timeLeft: number;
   isActif: boolean;
-  settingsName?: string;
+  settingsName: string;
   settings?: {
     id: string;
     alias: string;

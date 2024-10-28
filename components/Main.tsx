@@ -13,7 +13,9 @@ const Main: React.FC<MainProps> = (props) => {
   const router = useRouter();
 
   const generator = props.generator;
-  const settings = generator.settings;
+  const settings = props.settings;
+
+  console.log(settings);
 
   // State for generator's data
   const [name, setName] = useState(generator.name);
@@ -56,7 +58,7 @@ const Main: React.FC<MainProps> = (props) => {
     if (isKillerActive) return killerTimerDuration * 1000;
     if (isKillerCooldown) return killerCooldown * 1000;
     if (activePlayers === 0) return null;
-    const timeForPlayers = timerDuration / playerTimerRate[activePlayers];
+    const timeForPlayers = timerDuration / playerTimerRate[activePlayers - 1];
     return (timeForPlayers * 1000) / 60;
   };
 

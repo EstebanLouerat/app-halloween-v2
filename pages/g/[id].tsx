@@ -8,9 +8,11 @@ import {
   clearGeneratorFromLocalStorage,
   clearTimerFromLocalStorage,
 } from "@/utils/localStorage";
+import { DbdSetting } from "../api/settings";
 
 export type MainProps = {
   generator: DbdGenerator;
+  settings: DbdSetting;
   totalGen: number;
   totalGenDone: number;
 };
@@ -35,7 +37,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   // Trouver le générateur avec l'ID donné
-  const generator = generators.find((g) => g.id == id) as DbdGenerator;
+  const generator = await prisma.generator.findUnique({
+    where: { id: id },
+    include: { settings: true },
+  });
 
   if (!generator) {
     return {
@@ -46,6 +51,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
+  const settings = await prisma.settings.findUnique({
+    where: { alias: generator.settingsName },
+  });
+
   // Calculer le nombre de générateurs et ceux qui sont terminés
   generators.forEach((g) => {
     totalGen++;
@@ -53,7 +62,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   });
 
   const mainProps: MainProps = {
-    generator: generator,
+    generator: generator as DbdGenerator,
+    settings: settings as DbdSetting,
     totalGen: totalGen,
     totalGenDone: genDone,
   };

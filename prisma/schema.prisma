@@ -25,5 +25,5 @@ model Generator {
   isActif    Boolean   @default(false)
   settings   Settings? @relation(fields: [settingsName], references: [alias])
   //TODO foreign key on settings
-  settingsName String?
+  settingsName String
 }
