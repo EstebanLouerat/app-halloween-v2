@@ -2,7 +2,7 @@ import { GetServerSideProps } from "next";
 import Main from "../../components/Main";
 import prisma from "@/lib/prisma";
 import { DbdGenerator } from "../api/generators";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
   clearGeneratorFromLocalStorage,
@@ -92,6 +92,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 const Generator = (props: MainProps) => {
   const router = useRouter();
+  const [totalGenDone, setTotalGenDone] = useState(props.totalGenDone);
 
   useEffect(() => {
     if (router.pathname === "/g") {
@@ -99,6 +100,23 @@ const Generator = (props: MainProps) => {
       clearTimerFromLocalStorage();
     }
   }, [router]);
+
+  useEffect(() => {
+    const fetchGenDone = async () => {
+      try {
+        const res = await fetch(`/api/generators/${props.generator.id}/done`);
+        if (res.ok) {
+          const data = await res.json();
+          setTotalGenDone(data.totalGenDone);
+        }
+      } catch (error) {
+        console.error("Erreur lors du fetch de totalGenDone:", error);
+      }
+    };
+
+    const interval = setInterval(fetchGenDone, 5000);
+    return () => clearInterval(interval);
+  }, [props.generator.id]);
 
   return (
     <>

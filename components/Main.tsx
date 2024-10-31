@@ -1,9 +1,14 @@
+import {
+  NotificationStatus,
+  useNotification,
+} from "@/contexts/NotificationContext";
 import { DbdGenerator } from "@/pages/api/generators";
 import { MainProps } from "@/pages/g/[id]";
 import {
   getTimerFromLocalStorage,
   saveTimerToLocalStorage,
 } from "@/utils/localStorage";
+import axios from "axios";
 import confetti from "canvas-confetti";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -11,11 +16,10 @@ import { SlSettings } from "react-icons/sl";
 
 const Main: React.FC<MainProps> = (props) => {
   const router = useRouter();
+  const { showNotification } = useNotification();
 
   const generator = props.generator;
   const settings = props.settings;
-
-  console.log(settings);
 
   // State for generator's data
   const [name, setName] = useState(generator.name);
@@ -92,14 +96,54 @@ const Main: React.FC<MainProps> = (props) => {
     return Math.round(((timerDuration - count) / timerDuration) * 100);
   };
 
+  const GeneratorDone = () => {
+    const editingGenerator: DbdGenerator = {
+      ...generator,
+      timeLeft: 0,
+    };
+    axios
+      .put(`/api/generators`, {
+        ...editingGenerator,
+      })
+      .then(() => {
+        showNotification("C'est finito !", NotificationStatus.SUCCESS);
+        setIsTimerRunning(false);
+        showConfetti();
+      })
+      .catch((error) => {
+        showNotification(
+          `Error updating generator: ${error}`,
+          NotificationStatus.ERREUR
+        );
+      });
+  };
+
+  const updateTimeLeftGen = (timeLeft: number) => {
+    generator.timeLeft = timeLeft;
+
+    axios
+      .put(`/api/generators`, {
+        ...generator,
+      })
+      .then(() => {
+        console.log(generator);
+      })
+      .catch((error) => {
+        showNotification(
+          `Error updating generator: ${error}`,
+          NotificationStatus.ERREUR
+        );
+      });
+  };
+
   const updateTimer = useCallback(() => {
     setCount((prevCount) => {
       if (prevCount <= 0) {
-        setIsTimerRunning(false);
-        showConfetti();
+        GeneratorDone();
         return timerDuration; // Reset to the full duration after finishing
       }
       saveTimerToLocalStorage(prevCount - 1);
+      updateTimeLeftGen(prevCount - 1);
       return prevCount - 1;
     });
   }, [timerDuration]);
@@ -218,11 +262,11 @@ const Main: React.FC<MainProps> = (props) => {
 
   return (
     <div
-      className="relative flex flex-col justify-center items-center w-screen h-screen overflow-hidden px-4"
+      className="relative flex flex-col justify-center items-center w-screen h-screen overflow-hidden px-4 select-none"
       style={{ backgroundColor: "var(--color-grey-900-transparent)" }}
     >
       <button
-        className="absolute top-2 left-2 bg-gray-200 p-2 rounded hover:bg-gray-300 transition duration-300"
+        className="absolute top-2 left-2 bg-gray-200 p-2 rounded hover:bg-gray-300 transition duration-300 select-none"
         onClick={() => router.push(`/g/${generator.id}/settings`)}
       >
         <SlSettings color="black" size={"20px"} />
@@ -247,22 +291,35 @@ const Main: React.FC<MainProps> = (props) => {
             </p>
           )
         )}
-        <div className="mt-4">
-          <h2 className="mb-4">
-            Total <span className="text-green-400">{genActif}</span>/{totalGen}
+        <div className="mt-4 select-none">
+          <h2 className="mb-4 select-none">
+            Total <span className="text-green-400 select-none">{genActif}</span>
+            /{totalGen}
           </h2>
-          <h2 className="text-2xl mb-4">Hold your button!</h2>
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 h-[50svh]">
-            <button className="bg-red-500 p-4 rounded" {...buttonProps}>
+          <h2 className="text-2xl mb-4 select-none">Hold your button!</h2>
+          <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 h-[50svh] select-none">
+            <button
+              className="bg-red-500 p-4 rounded select-none"
+              {...buttonProps}
+            >
               Player 1
             </button>
-            <button className="bg-blue-500 p-4 rounded" {...buttonProps}>
+            <button
+              className="bg-blue-500 p-4 rounded select-none"
+              {...buttonProps}
+            >
               Player 2
             </button>
-            <button className="bg-green-500 p-4 rounded" {...buttonProps}>
+            <button
+              className="bg-green-500 p-4 rounded select-none"
+              {...buttonProps}
+            >
               Player 3
             </button>
-            <button className="bg-yellow-500 p-4 rounded" {...buttonProps}>
+            <button
+              className="bg-yellow-500 p-4 rounded select-none"
+              {...buttonProps}
+            >
               Player 4
             </button>
           </div>

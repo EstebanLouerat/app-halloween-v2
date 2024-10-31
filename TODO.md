@@ -13,6 +13,13 @@
   - [ ] Editer les paramettres
   - [ ] _Optionnel: Modifier les paramettres global ou unique au générateur_
 
+  ## MàJ
+
+  - [x] Texte non selectionnable
+  - [x] Mise à jour du nbre de gen en arrière plan
+  - [x] Interface maitre du jeu
+  - [x] auto refresh
+
 ## Idées
 
 - [ ] une page de création de générateur ou l'on peut choisir la couleur, le nom (par défaut 'Générateur n') et les settings
