@@ -36,6 +36,27 @@ const Menu: React.FC<MenuProps> = ({ generators }) => {
     return <>There is no generator</>;
   }
 
+  const generateTenGenerators = async () => {
+    try {
+      for (let i = 1; i <= 10; i++) {
+        await axios.post("/api/generators", {
+          name: i.toString(),
+          settingsName: "Default",
+        });
+      }
+      showNotification(
+        "10 générateurs créés avec succès !",
+        NotificationStatus.SUCCESS
+      );
+      router.reload();
+    } catch (error) {
+      showNotification(
+        `Erreur lors de la création de générateurs: ${error}`,
+        NotificationStatus.ERREUR
+      );
+    }
+  };
+
   const handleAddGenerator = () => {
     if (!newGeneratorName) {
       showNotification("Faut donner un nom avant.", NotificationStatus.DANGER);
@@ -142,6 +163,25 @@ const Menu: React.FC<MenuProps> = ({ generators }) => {
     }
   };
 
+  function reinitialisation(): void {
+    axios
+      .get(`/api/generators/res`)
+      .then(() => {
+        showNotification(
+          "Generator has been res successfully!",
+          NotificationStatus.SUCCESS
+        );
+        // setShowDeleteModal(null);
+        // router.reload();
+      })
+      .catch((error) => {
+        showNotification(
+          `Error resing generator: ${error}`,
+          NotificationStatus.ERREUR
+        );
+      });
+  }
+
   return (
     <div
       className="h-screen w-screen"
@@ -152,6 +192,12 @@ const Menu: React.FC<MenuProps> = ({ generators }) => {
         onClick={() => router.push("/gm")}
       >
         Maitre du jeu
+      </button>
+      <button
+        className="absolute top-4 left-4 p-2 rounded bg-gray-700 hover:bg-gray-600 transition duration-300"
+        onClick={() => reinitialisation()}
+      >
+        Reinitialisation
       </button>
       <div className="flex items-start justify-center h-[35svh]">
         <h1 className="text-4xl text-white mt-20 mb-6">
@@ -165,6 +211,13 @@ const Menu: React.FC<MenuProps> = ({ generators }) => {
           onClick={() => setCreatingGenerator(true)}
         >
           Ajouter
+        </button>
+
+        <button
+          className="bg-purple-500 text-white text-lg px-6 py-3 rounded mb-4 hover:bg-purple-600 transition"
+          onClick={generateTenGenerators}
+        >
+          Générer 10 générateurs
         </button>
 
         <div className="h-[50vh] w-full overflow-y-scroll items-center justify-start flex flex-col">
