@@ -147,6 +147,12 @@ const Menu: React.FC<MenuProps> = ({ generators }) => {
       className="h-screen w-screen"
       style={{ backgroundColor: "var(--color-grey-900-transparent)" }}
     >
+      <button
+        className="absolute top-4 right-4 p-2 rounded bg-green-700 hover:bg-green-600 transition duration-300"
+        onClick={() => router.push("/gm")}
+      >
+        Maitre du jeu
+      </button>
       <div className="flex items-start justify-center h-[35svh]">
         <h1 className="text-4xl text-white mt-20 mb-6">
           Gérer les générateurs
